@@ -25,10 +25,10 @@ class TodoListViewController: UITableViewController {
         // Do any additional setup after loading the view.
         
         // Get data location
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+        // print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
 
         // Retrieve saved/persistent data if it exists
-        //loadItems()
+        loadItems()
     }
     
     //MARK - TableView Delegate Methods
@@ -64,7 +64,12 @@ class TodoListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        // Toggling
+        // CRUD Delete
+        // Order must go context.delete then UI itemArray.remove
+//        context.delete(itemArray[indexPath.row])
+//        itemArray.remove(at: indexPath.row)
+        
+        // Toggling Checked/Unchecked
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
         
         saveItems()
@@ -113,6 +118,7 @@ class TodoListViewController: UITableViewController {
     
     //MARK - Model Manipulation Methods
     
+    // CRUD - Create
     func saveItems(){
     
         // Set itemArray to defaults
@@ -127,17 +133,19 @@ class TodoListViewController: UITableViewController {
     
     }
     
-//    func loadItems(){
-//        if let data = try? Data(contentsOf: dataFilePath!){
-//            let decoder = PropertyListDecoder()
-//
-//            do {
-//            itemArray = try decoder.decode([Item].self, from: data)
-//            } catch {
-//                print("Error decoding item array \(error)")
-//            }
-//        }
-//    }
+    // CRUD - Read
+    func loadItems(){
+        
+        // Make read fetch request
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        
+        do {
+            // Speak to context first if successful save results in itemArray
+            itemArray = try context.fetch(request)
+        } catch {
+            print("Error fetching data from context \(error)")
+        }
+    }
 
 }
 
