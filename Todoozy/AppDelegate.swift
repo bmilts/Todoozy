@@ -40,8 +40,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     lazy var persistentContainer: NSPersistentContainer = {
 
+        // 1. Data Model steps
         // Sets container with name of data model
         let container = NSPersistentContainer(name: "DataModel")
+        
+        // 2. Load
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
 
