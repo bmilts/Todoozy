@@ -31,7 +31,7 @@ class TodoListViewController: UITableViewController {
         loadItems()
     }
     
-    //MARK - TableView Delegate Methods
+    //MARK - TableView Datasource Methods
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
@@ -78,7 +78,7 @@ class TodoListViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    //Mark - Add new items section
+    //MARK: - Add new items section
     
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
@@ -116,7 +116,7 @@ class TodoListViewController: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    //MARK - Model Manipulation Methods
+    //MARK: - Model Manipulation Methods
     
     // CRUD - Create
     func saveItems(){
@@ -134,18 +134,63 @@ class TodoListViewController: UITableViewController {
     }
     
     // CRUD - Read
-    func loadItems(){
-        
-        // Make read fetch request
-        let request : NSFetchRequest<Item> = Item.fetchRequest()
+    // Internal external calls
+    // Request externally "with"
+    // Internally "request"
+    // Default value = Item.fetchRequest
+    func loadItems(with request : NSFetchRequest<Item> = Item.fetchRequest()){
         
         do {
             // Speak to context first if successful save results in itemArray
             itemArray = try context.fetch(request)
         } catch {
-            print("Error fetching data from context \(error)")
+            print("Error fetching  data from context \(error)")
         }
+        
+        tableView.reloadData()
     }
 
+}
+
+
+//MARK: - Search bar methods
+extension TodoListViewController : UISearchBarDelegate {
+    
+    // Triggered on search bar click
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        let request :  NSFetchRequest<Item> = Item.fetchRequest()
+        
+        // Filter query using core data by title
+        // NSPredicate is a query language
+        // [cd] Case and diacriticinsensitive
+        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        
+        // Sort data
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+        
+        loadItems(with: request)
+    }
+    
+    // Check fot text changes
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        // When text goes back to 0 (Cross button or otherwise)
+        if searchBar.text?.count == 0 {
+            
+            // Load items from database
+            loadItems()
+            
+            // Manages execution of processing tasks
+            // Main thread update user information
+            DispatchQueue.main.async {
+                // No longer editing revert back to state
+                searchBar.resignFirstResponder()
+            }
+            
+            
+        }
+    }
+    
 }
 
