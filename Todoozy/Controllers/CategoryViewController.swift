@@ -11,46 +11,36 @@ import CoreData
 
 class CategoryViewController: UITableViewController {
     
-    var categoryArray = [Category]()
+    var categories = [Category]()
     
+    // Context to get information
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
+        loadCategories()
     }
     
     //MARK: - TableView Data Source Methods
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return categoryArray.count
+        return categories.count
         
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
-        
-        let category = categoryArray[indexPath.row]
-        
-        cell.textLabel?.text = category.name
-        
-        // Termary operator ==>
-        // value = condition ? valueIfTrue : valueIfFales
-        
-        //        if item.done == true {
-        //            cell.accessoryType = .checkmark
-        //        } else {
-        //            cell.accessoryType = .none
-        //        }
-        
-        // Ternary conversion of above
-        // cell.accessoryType = ite.done ? .checkmark : .none
+    
+        // Set cells name
+        cell.textLabel?.text = categories[indexPath.row].name
         
         return cell
     }
+    
+    //MARK: - TableView Delegate Methods
     
     // Clicked on category
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -60,14 +50,21 @@ class CategoryViewController: UITableViewController {
         //        context.delete(itemArray[indexPath.row])
         //        itemArray.remove(at: indexPath.row)
         
-        // Toggling Checked/Unchecked
-        // categoryArray[indexPath.row].done = !itemArray[indexPath.row].done
-        
-        // saveCategories()
-        
-        // Flashes grey and back to white
-        // tableView.deselectRow(at: indexPath, animated: true)
+        performSegue(withIdentifier: "goToItems", sender: self)
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        let destinationVC = segue.destination as! TodoListViewController
+        
+        // If more segues use an if statement to check segue identifier "goToItems" etc
+        
+        // Grab selected cell category
+        if let indexPath = tableView.indexPathForSelectedRow {
+            destinationVC.selectedCategory = categories[indexPath.row]
+        }
+    }
+    
     
     //MARK: - Data Manipulation Methods
     
@@ -76,13 +73,14 @@ class CategoryViewController: UITableViewController {
         
         // Set itemArray to defaults
         // 4. Data save context to Database
+        
         do {
             try context.save()
         } catch {
-            print("Erro saving context \(error)")
+            print("Error saving category \(error)")
         }
         
-        self.tableView.reloadData()
+        tableView.reloadData()
         
     }
     
@@ -91,11 +89,13 @@ class CategoryViewController: UITableViewController {
     // Request externally "with"
     // Internally "request"
     // Default value = Item.fetchRequest
-    func loadCategories(with request : NSFetchRequest<Category> = Category.fetchRequest()){
+    func loadCategories(){
+        
+        let request : NSFetchRequest<Category> = Category.fetchRequest()
         
         do {
             // Speak to context first if successful save results in itemArray
-            categoryArray = try context.fetch(request)
+            categories = try context.fetch(request)
         } catch {
             print("Error fetching  data from context \(error)")
         }
@@ -105,7 +105,6 @@ class CategoryViewController: UITableViewController {
     
     //MARK: - Add New Categories
 
-
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
         var textField = UITextField()
@@ -113,7 +112,7 @@ class CategoryViewController: UITableViewController {
         // Alert button and textfield
         let alert = UIAlertController(title: "Add New Category", message: "", preferredStyle: .alert)
         
-        let action = UIAlertAction(title: "Add Category", style: .default) {(action) in
+        let action = UIAlertAction(title: "Add", style: .default) { (action) in
             
             // What happens once user clicks add item button
             print("Add category pressed!")
@@ -123,26 +122,23 @@ class CategoryViewController: UITableViewController {
             
             // 4. Fill NSManaged objects fields
             newCategory.name  = textField.text!
-            self.categoryArray.append(newCategory)
+            self.categories.append(newCategory)
             
             self.saveCategories()
             
         }
         
-        alert.addTextField { (alertTextField) in
-            
-            alertTextField.placeholder = "Create New Category"
-            
-            textField = alertTextField
-        }
-        
         alert.addAction(action)
+        
+        alert.addTextField { (field) in
+            
+            textField = field
+            textField.placeholder = "Add a new category"
+        }
         
         present(alert, animated: true, completion: nil)
         
     }
-    
-    //MARK: - TableView Delegate Methods
     
     
 }
