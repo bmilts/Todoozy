@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import CoreData
 import RealmSwift
 
 @UIApplicationMain
@@ -20,25 +19,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         
         // Locate realm database
-        print(Realm.Configuration.defaultConfiguration.fileURL)
+        //print(Realm.Configuration.defaultConfiguration.fileURL)
         
         // Realm
         do {
-            let realm = try Realm()
+            _ = try Realm()
         } catch {
             print("Error initializing new realm \(error)")
         }
         
         return true
-    }
-
-    // Might need save functionality
-    func applicationWillTerminate(_ application: UIApplication) {
-        // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
-        
-        // Cases
-        self.saveContext()
-        
     }
     
     // MARK: - Core Data stack
@@ -46,41 +36,41 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // NSPersistent containter = SQLite Database
     // Can use XML instead
     
-    lazy var persistentContainer: NSPersistentContainer = {
-
-        // 1. Data Model steps
-        // Sets container with name of data model
-        let container = NSPersistentContainer(name: "DataModel")
-        
-        // 2. Load
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-            if let error = error as NSError? {
-
-                fatalError("Unresolved error \(error), \(error.userInfo)")
-            }
-        })
-        
-        // Return container set as NSPersisten container
-        return container
-    }()
-    
-    // MARK: - Core Data Saving support
-    
-    // Saves data if app closes
-    
-    func saveContext () {
-        
-        // Context update change and play with data until it is commited
-        let context = persistentContainer.viewContext
-        if context.hasChanges {
-            do {
-                try context.save()
-            } catch {
-                let nserror = error as NSError
-                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-            }
-        }
-    }
+//    lazy var persistentContainer: NSPersistentContainer = {
+//
+//        // 1. Data Model steps
+//        // Sets container with name of data model
+//        let container = NSPersistentContainer(name: "DataModel")
+//
+//        // 2. Load
+//        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+//            if let error = error as NSError? {
+//
+//                fatalError("Unresolved error \(error), \(error.userInfo)")
+//            }
+//        })
+//
+//        // Return container set as NSPersisten container
+//        return container
+//    }()
+//
+//    // MARK: - Core Data Saving support
+//
+//    // Saves data if app closes
+//
+//    func saveContext () {
+//
+//        // Context update change and play with data until it is commited
+//        let context = persistentContainer.viewContext
+//        if context.hasChanges {
+//            do {
+//                try context.save()
+//            } catch {
+//                let nserror = error as NSError
+//                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+//            }
+//        }
+//    }
 
 
 }
