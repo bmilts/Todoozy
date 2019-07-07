@@ -5,6 +5,9 @@ Application completed to learn more intermediate swift, MVC along with user defa
 
 <img src="todo.gif" width="190" height="350" />
 
+## Key Learning
+
+* 
 
 
 
